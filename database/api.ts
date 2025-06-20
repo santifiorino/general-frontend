@@ -1,5 +1,9 @@
 import { Player, Game, Score } from "./types";
 
+import { loadEnvConfig } from "@next/env";
+const projectDir = process.cwd();
+loadEnvConfig(projectDir);
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
@@ -8,11 +12,11 @@ function getHeaders(): HeadersInit {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-  
+
   if (API_TOKEN) {
     headers["Authorization"] = `Bearer ${API_TOKEN}`;
   }
-  
+
   return headers;
 }
 
@@ -24,7 +28,7 @@ export async function fetchUsers(): Promise<Player[]> {
 }
 
 export async function startGame(
-  players: Player[]
+  players: Player[],
 ): Promise<{ gameId: string }> {
   const res = await fetch(`${API_URL}/games`, {
     method: "POST",
@@ -57,7 +61,7 @@ export async function getGame(gameId: string): Promise<Game> {
   } = await res.json();
 
   const sortedPlayers = players.sort(
-    (a: Player, b: Player) => (a.order || 0) - (b.order || 0)
+    (a: Player, b: Player) => (a.order || 0) - (b.order || 0),
   );
 
   return {
@@ -72,7 +76,7 @@ export async function getGame(gameId: string): Promise<Game> {
 
 export async function setScore(
   gameId: string,
-  score: { playerId: string; scoreCategory: string; score: number }
+  score: { playerId: string; scoreCategory: string; score: number },
 ): Promise<{ winnerId: string | null; score: Score }> {
   const res = await fetch(
     `${API_URL}/games/${gameId}/players/${score.playerId}/scores`,
@@ -83,7 +87,7 @@ export async function setScore(
         category: score.scoreCategory,
         score: score.score,
       }),
-    }
+    },
   );
   if (!res.ok) {
     throw new Error("Failed to set score");
@@ -95,14 +99,14 @@ export async function setScore(
 export async function deleteScore(
   gameId: string,
   playerId: string,
-  category: string
+  category: string,
 ): Promise<void> {
   const res = await fetch(
     `${API_URL}/games/${gameId}/players/${playerId}/scores/${category}`,
     {
       method: "DELETE",
       headers: getHeaders(),
-    }
+    },
   );
   if (!res.ok) {
     throw new Error("Failed to delete score");
