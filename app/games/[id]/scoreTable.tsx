@@ -34,7 +34,7 @@ export function ScoreTable({ players }: { players: Player[] }) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Jugada</TableHead>
+          <TableHead className="sticky left-0 bg-background">Jugada</TableHead>
           {players.map((player) => (
             <TableHead key={player.id} className="text-center">
               {player.name}
@@ -45,7 +45,9 @@ export function ScoreTable({ players }: { players: Player[] }) {
       <TableBody>
         {scoreCategories.map((category) => (
           <TableRow key={category}>
-            <TableCell>{category}</TableCell>
+            <TableCell className="sticky left-0 bg-background">
+              {category === "Generala Doble" ? "Generala D" : category}
+            </TableCell>
             {players.map((player) => (
               <TableCell key={player.id} className="text-center">
                 {player[category] ?? "-"}
@@ -56,7 +58,7 @@ export function ScoreTable({ players }: { players: Player[] }) {
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell>Total</TableCell>
+          <TableCell className="sticky left-0 bg-background">Total</TableCell>
           {totals.map((total, index) => (
             <TableCell key={players[index].id} className="text-center">
               {total}
