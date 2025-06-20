@@ -2,13 +2,14 @@
 
 import { useState, useEffect, use } from "react";
 import { Player } from "@/database/types";
-import { getGame, setScore, deleteScore } from "@/database/api";
+import { getGame, setScore, deleteScore, setWinner as apiSetWinner } from "@/database/api";
 import { ScoreTable } from "./scoreTable";
 import { ControlPage } from "./controlPage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BackButton } from "@/components/back-button";
+import { TieBreakDialog } from "./tieBreakDialog";
 
-import { Score } from "@/database/types";
+import { Score, scores } from "@/database/types";
 
 export default function GamePage({
   params,
@@ -21,6 +22,7 @@ export default function GamePage({
   const [winner, setWinner] = useState<Player | null>(null);
   const [history, setHistory] = useState<Score[]>([]);
   const [generalaServida, setGeneralaServida] = useState<boolean>(false);
+  const [tiedPlayers, setTiedPlayers] = useState<Player[]>([]);
   
   useEffect(() => {
     getGame(id).then((game) => {
@@ -38,6 +40,45 @@ export default function GamePage({
       }
     });
   }, [id]);
+
+  useEffect(() => {
+    if (
+      players.length > 0 &&
+      turn >= players.length * (Object.keys(scores).length - 1) &&
+      !winner
+    ) {
+      const scoreCategories = Object.keys(scores).filter(
+        (c) => c !== "Generala Servida"
+      );
+
+      const calculateTotalScore = (player: Player) => {
+        return scoreCategories.reduce((total, category) => {
+          const key = category as keyof Player;
+          return total + (Number(player[key]) || 0);
+        }, 0);
+      };
+
+      const playerScores = players.map((p) => ({
+        player: p,
+        totalScore: calculateTotalScore(p),
+      }));
+
+      if (playerScores.length > 0) {
+        const maxScore = Math.max(...playerScores.map((ps) => ps.totalScore));
+        const winners = playerScores
+          .filter((ps) => ps.totalScore === maxScore)
+          .map((ps) => ps.player);
+
+        if (winners.length > 1) {
+          if (tiedPlayers.length === 0) {
+            setTiedPlayers(winners);
+          }
+        } else if (winners.length === 1) {
+          handleSetWinner(winners[0].id);
+        }
+      }
+    }
+  }, [turn, players, winner, tiedPlayers]);
 
   const handleScoreSelect = async (value: number, category: string) => {
     const scoreData = {
@@ -67,17 +108,31 @@ export default function GamePage({
     
     setHistory([...history, newScore]);
 
-    if (result && result.winnerId) {
-      const winnerPlayer = players.find((p) => p.id === result.winnerId);
+    if (result && result.winnerId.length == 1) {
+      const winnerPlayer = players.find((p) => p.id === result.winnerId[0]);
       if (winnerPlayer) {
         setWinner(winnerPlayer);
       }
+    }
+
+    if (result && result.winnerId.length > 1) {
+      const tied = players.filter((p) => result.winnerId.includes(p.id));
+      setTiedPlayers(tied);
     }
 
     if (category === "Generala Servida") {
       setGeneralaServida(true);
     }
   };
+
+  const handleSetWinner = async (winnerId: string) => {
+    await apiSetWinner(id, winnerId);
+    const winnerPlayer = players.find((p) => p.id === winnerId);
+    if (winnerPlayer) {
+      setWinner(winnerPlayer);
+    }
+    setTiedPlayers([]);
+  }
 
   const handleUndo = async () => {
     const lastScore = history[history.length - 1];
@@ -141,7 +196,7 @@ export default function GamePage({
           {winner.name}
         </h2>
         {generalaServida && (
-          <p className="text-center font-mono text-yellow-500 text-lg mt-2 mb-4">
+          <p className="text-center font-mono text-yellow-500 text-lg">
             GENERALA SERVIDA
           </p>
         )}
@@ -149,14 +204,14 @@ export default function GamePage({
         <ScoreTable players={players} />
       </div>
     );
-  }
-
-  if (players.length === 0) {
-    return (
-      <div className="container mx-auto p-4">
-        <h1>Cargando...</h1>
-      </div>
-    );
+  } else {
+    if (players.length === 0) {
+      return (
+        <div className="container mx-auto p-4">
+          <h1>Cargando...</h1>
+        </div>
+      );
+    }
   }
 
   return (
@@ -183,6 +238,11 @@ export default function GamePage({
           </div>
         </TabsContent>
       </Tabs>
+      <TieBreakDialog
+        open={tiedPlayers.length > 0}
+        players={tiedPlayers}
+        onSelectWinner={handleSetWinner}
+      />
     </div>
   );
 }

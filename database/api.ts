@@ -3,7 +3,6 @@ import { Player, Game, Score, Ranking } from "./types";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
-// Helper function to get headers with authorization
 function getHeaders(): HeadersInit {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -57,7 +56,7 @@ export async function getGame(gameId: string): Promise<Game> {
 export async function setScore(
   gameId: string,
   score: { playerId: string; scoreCategory: string; score: number },
-): Promise<{ winnerId: string | null; score: Score }> {
+): Promise<{ winnerId: string[]; score: Score }> {
   const res = await fetch(
     `${API_URL}/games/${gameId}/players/${score.playerId}/scores`,
     {
@@ -90,6 +89,21 @@ export async function deleteScore(
   );
   if (!res.ok) {
     throw new Error("Failed to delete score");
+  }
+}
+
+export async function setWinner(
+  gameId: string,
+  winnerId: string,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/games/${gameId}`, {
+    method: "PATCH",
+    headers: getHeaders(),
+    body: JSON.stringify({ winnerId }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to set winner");
   }
 }
 
