@@ -47,7 +47,7 @@ export default function GamePage({
       }
     });
   }, [id]);
-  
+
   const handleSetWinner = async (winnerId: string) => {
     await apiSetWinner(id, winnerId);
     const winnerPlayer = players.find((p) => p.id === winnerId);
@@ -95,7 +95,7 @@ export default function GamePage({
       }
     }
   }, [turn, players, winner, tiedPlayers, handleSetWinner]);
-  
+
   const handleScoreSelect = async (value: number, category: string) => {
     const scoreData = {
       playerId: players[turn % players.length].id,
@@ -141,7 +141,6 @@ export default function GamePage({
     }
   };
 
-
   const handleUndo = async () => {
     const lastScore = history[history.length - 1];
     if (!lastScore) return;
@@ -176,7 +175,7 @@ export default function GamePage({
     const isNumberCategory = ["1", "2", "3", "4", "5", "6"].includes(category);
 
     if (score === 0) {
-      let article = ["Escalera", "Generala", "Generala Doble"].includes(
+      const article = ["Escalera", "Generala", "Generala Doble"].includes(
         category,
       )
         ? "la"
@@ -192,7 +191,7 @@ export default function GamePage({
         )
           ? "a"
           : "o";
-        let servidoText = "Servid" + letter;
+        const servidoText = "Servid" + letter;
         undoText = `${playerName} anotó ${category} ${servidoText}`;
       } else {
         // No servido
