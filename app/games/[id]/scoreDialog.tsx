@@ -22,7 +22,9 @@ export function ScoreDialog({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Puntaje</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">
+            Puntaje
+          </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-2">
           {options.map((option) => (

@@ -71,7 +71,8 @@ export function ControlPage({
   const [selectedScoreCategory, setSelectedScoreCategory] = useState<
     string | null
   >(null);
-  const [showGeneralaServidaDialog, setShowGeneralaServidaDialog] = useState(false);
+  const [showGeneralaServidaDialog, setShowGeneralaServidaDialog] =
+    useState(false);
 
   const handleCloseDialog = () => {
     setSelectedScoreCategory(null);
@@ -93,7 +94,6 @@ export function ControlPage({
     setShowGeneralaServidaDialog(false);
   };
 
-  
   let dialogOptions: number[] = [];
   if (selectedScoreCategory) {
     const currentPlayer = players[turn % players.length];
@@ -101,12 +101,14 @@ export function ControlPage({
     if (
       selectedScoreCategory === "Generala" &&
       currentPlayer["Generala Doble"] === null
-    ) { // Can't score 0 in generala if Generala Doble is not on 0 yet
+    ) {
+      // Can't score 0 in generala if Generala Doble is not on 0 yet
       dialogOptions = baseOptions.filter((option) => option !== 0);
     } else if (
       selectedScoreCategory === "Generala Doble" &&
       currentPlayer["Generala"] !== 50
-    ) { // Can't score 100 in generala doble if Generala is not on 50 yet
+    ) {
+      // Can't score 100 in generala doble if Generala is not on 50 yet
       dialogOptions = baseOptions.filter((option) => option !== 100);
     } else {
       dialogOptions = baseOptions;
@@ -199,9 +201,7 @@ export function ControlPage({
           <StringButton
             value="Generala Doble"
             onClick={() => setSelectedScoreCategory("Generala Doble")}
-            disabled={
-              players[turn % players.length]["Generala Doble"] !== null
-            }
+            disabled={players[turn % players.length]["Generala Doble"] !== null}
           />
           <StringButton
             value="Generala Servida"

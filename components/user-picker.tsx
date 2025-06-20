@@ -34,7 +34,6 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  type UniqueIdentifier,
 } from "@dnd-kit/core";
 
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -158,11 +157,6 @@ export function DataTable({
     useSensor(KeyboardSensor, {}),
   );
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
-    [data],
-  );
-
   const table = useReactTable({
     data,
     columns,
@@ -179,19 +173,16 @@ export function DataTable({
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
       setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
+        const oldIndex = data.findIndex((item) => item.id === active.id);
+        const newIndex = data.findIndex((item) => item.id === over.id);
         return arrayMove(data, oldIndex, newIndex);
       });
     }
   }
 
   const selectedPlayers = React.useMemo(() => {
-    return table
-      .getSelectedRowModel()
-      .rows.map((row) => data.find((player) => player.id === row.original.id))
-      .filter((player): player is Player => player !== undefined);
-  }, [data, table]);
+    return data.filter((player) => rowSelection[player.id]);
+  }, [data, rowSelection]);
 
   const handleStartGame = () => {
     if (selectedPlayers.length > 0) {
@@ -252,7 +243,7 @@ export function DataTable({
             </TableHeader>
             <TableBody>
               <SortableContext
-                items={dataIds}
+                items={data.map((d) => d.id)}
                 strategy={verticalListSortingStrategy}
               >
                 {table.getRowModel().rows?.length ? (

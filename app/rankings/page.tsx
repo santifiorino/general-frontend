@@ -15,7 +15,9 @@ export default async function Rankings() {
       <div className="space-y-4">
         <WinsRanking players={rankings.wins} />
         <ScoresRanking players={rankings.scores} />
-        <GeneralasServidasRanking generalasServidas={rankings.generalasServidas} />
+        <GeneralasServidasRanking
+          generalasServidas={rankings.generalasServidas}
+        />
       </div>
     </div>
   );

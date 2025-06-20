@@ -22,9 +22,7 @@ export async function fetchUsers(): Promise<Player[]> {
   return response.json();
 }
 
-export async function startGame(
-  players: Player[],
-): Promise<{ id: string }> {
+export async function startGame(players: Player[]): Promise<{ id: string }> {
   const res = await fetch(`${API_URL}/games`, {
     method: "POST",
     headers: getHeaders(),

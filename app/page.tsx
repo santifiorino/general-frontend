@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Dices, Trophy, List } from 'lucide-react';
+import { Dices, Trophy, List } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {

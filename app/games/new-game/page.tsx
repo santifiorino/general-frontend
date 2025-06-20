@@ -31,4 +31,4 @@ export default function NewGamePage() {
       <DataTable data={users} onStartGame={handleStartGame} />
     </div>
   );
-} 
+}

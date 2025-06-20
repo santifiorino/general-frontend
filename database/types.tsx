@@ -10,10 +10,10 @@ export type Player = {
   "4"?: number | null;
   "5"?: number | null;
   "6"?: number | null;
-  "Escalera"?: number | null;
-  "Full"?: number | null;
-  "Poker"?: number | null;
-  "Generala"?: number | null;
+  Escalera?: number | null;
+  Full?: number | null;
+  Poker?: number | null;
+  Generala?: number | null;
   "Generala Doble"?: number | null;
 };
 
@@ -42,10 +42,10 @@ export const scores: Record<string, number[]> = {
   "4": [0, 4, 8, 12, 16, 20],
   "5": [0, 5, 10, 15, 20, 25],
   "6": [0, 6, 12, 18, 24, 30],
-  "Escalera": [0, 20, 25],
-  "Full": [0, 30, 35],
-  "Poker": [0, 40, 45],
-  "Generala": [0, 50],
+  Escalera: [0, 20, 25],
+  Full: [0, 30, 35],
+  Poker: [0, 40, 45],
+  Generala: [0, 50],
   "Generala Doble": [0, 100],
   "Generala Servida": [],
 };

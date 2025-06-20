@@ -26,20 +26,15 @@ export function GeneralaServidaDialog({
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <p className="text-lg">
-            Confirmar que <span className="font-bold">{playerName}</span> obtuvo una generala servida. Esto terminará la partida inmediatamente y le dará 2 victorias (en caso de ser una partida de 5 jugadores o más).
+            Confirmar que <span className="font-bold">{playerName}</span> obtuvo
+            una generala servida. Esto terminará la partida inmediatamente y le
+            dará 2 victorias (en caso de ser una partida de 5 jugadores o más).
           </p>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={onClose}
-            >
+            <Button variant="outline" className="flex-1" onClick={onClose}>
               Cancelar
             </Button>
-            <Button
-              className="flex-1"
-              onClick={onConfirm}
-            >
+            <Button className="flex-1" onClick={onConfirm}>
               Confirmar
             </Button>
           </div>
@@ -47,4 +42,4 @@ export function GeneralaServidaDialog({
       </DialogContent>
     </Dialog>
   );
-} 
+}
