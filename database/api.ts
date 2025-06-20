@@ -111,3 +111,10 @@ export async function getRankings(): Promise<Ranking> {
   });
   return res.json();
 }
+
+export async function getGames(): Promise<Game[]> {
+  const res = await fetch(`${API_URL}/games`, {
+    headers: getHeaders(),
+  });
+  return res.json();
+}

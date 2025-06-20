@@ -19,10 +19,12 @@ export default function Home() {
             Rankings
           </Button>
         </Link>
-        <Button className="w-full" size="lg" variant="secondary" disabled>
-          <List />
-          Historial
-        </Button>
+        <Link href="/games" passHref>
+          <Button className="w-full" size="lg" variant="secondary">
+            <List />
+            Historial
+          </Button>
+        </Link>
       </div>
     </div>
   );
