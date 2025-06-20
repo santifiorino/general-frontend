@@ -2,7 +2,12 @@
 
 import { useState, useEffect, use } from "react";
 import { Player } from "@/database/types";
-import { getGame, setScore, deleteScore, setWinner as apiSetWinner } from "@/database/api";
+import {
+  getGame,
+  setScore,
+  deleteScore,
+  setWinner as apiSetWinner,
+} from "@/database/api";
 import { ScoreTable } from "./scoreTable";
 import { ControlPage } from "./controlPage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,10 +28,12 @@ export default function GamePage({
   const [history, setHistory] = useState<Score[]>([]);
   const [generalaServida, setGeneralaServida] = useState<boolean>(false);
   const [tiedPlayers, setTiedPlayers] = useState<Player[]>([]);
-  
+
   useEffect(() => {
     getGame(id).then((game) => {
-      const gamePlayers = game.players.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const gamePlayers = game.players.sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
       setPlayers(gamePlayers);
       setTurn(game.turn);
       setHistory(game.scores);
@@ -40,6 +47,15 @@ export default function GamePage({
       }
     });
   }, [id]);
+  
+  const handleSetWinner = async (winnerId: string) => {
+    await apiSetWinner(id, winnerId);
+    const winnerPlayer = players.find((p) => p.id === winnerId);
+    if (winnerPlayer) {
+      setWinner(winnerPlayer);
+    }
+    setTiedPlayers([]);
+  };
 
   useEffect(() => {
     if (
@@ -48,7 +64,7 @@ export default function GamePage({
       !winner
     ) {
       const scoreCategories = Object.keys(scores).filter(
-        (c) => c !== "Generala Servida"
+        (c) => c !== "Generala Servida",
       );
 
       const calculateTotalScore = (player: Player) => {
@@ -78,8 +94,8 @@ export default function GamePage({
         }
       }
     }
-  }, [turn, players, winner, tiedPlayers]);
-
+  }, [turn, players, winner, tiedPlayers, handleSetWinner]);
+  
   const handleScoreSelect = async (value: number, category: string) => {
     const scoreData = {
       playerId: players[turn % players.length].id,
@@ -93,19 +109,19 @@ export default function GamePage({
           return { ...player, [category]: value };
         }
         return player;
-      })
+      }),
     );
-    
+
     setTurn(turn + 1);
 
     const result = await setScore(id, scoreData);
-    
+
     const newScore: Score = {
       ...result.score,
       category: category,
       score: value,
     };
-    
+
     setHistory([...history, newScore]);
 
     if (result && result.winnerId.length == 1) {
@@ -125,14 +141,6 @@ export default function GamePage({
     }
   };
 
-  const handleSetWinner = async (winnerId: string) => {
-    await apiSetWinner(id, winnerId);
-    const winnerPlayer = players.find((p) => p.id === winnerId);
-    if (winnerPlayer) {
-      setWinner(winnerPlayer);
-    }
-    setTiedPlayers([]);
-  }
 
   const handleUndo = async () => {
     const lastScore = history[history.length - 1];
@@ -140,11 +148,7 @@ export default function GamePage({
 
     const lastPlayer = players[(turn - 1) % players.length];
 
-    await deleteScore(
-      id,
-      lastPlayer.id,
-      lastScore.category
-    );
+    await deleteScore(id, lastPlayer.id, lastScore.category);
 
     setHistory(history.slice(0, -1));
     setPlayers(
@@ -153,7 +157,7 @@ export default function GamePage({
           return { ...player, [lastScore.category]: null };
         }
         return player;
-      })
+      }),
     );
     setTurn(turn - 1);
     setWinner(null);
@@ -172,16 +176,26 @@ export default function GamePage({
     const isNumberCategory = ["1", "2", "3", "4", "5", "6"].includes(category);
 
     if (score === 0) {
-      let article = ["Escalera", "Generala", "Generala Doble"].includes(category) ? "la" : "el";
+      let article = ["Escalera", "Generala", "Generala Doble"].includes(
+        category,
+      )
+        ? "la"
+        : "el";
       undoText = `${playerName} tachó ${article} ${category}`;
     } else if (isNumberCategory) {
       undoText = `${playerName} anotó ${score} al ${category}`;
     } else {
-      if (score % 10 === 5) { // Servido
-        const letter = ["Escalera", "Generala", "Generala Doble"].includes(category) ? "a" : "o";
+      if (score % 10 === 5) {
+        // Servido
+        const letter = ["Escalera", "Generala", "Generala Doble"].includes(
+          category,
+        )
+          ? "a"
+          : "o";
         let servidoText = "Servid" + letter;
         undoText = `${playerName} anotó ${category} ${servidoText}`;
-      } else { // No servido
+      } else {
+        // No servido
         undoText = `${playerName} anotó ${category}`;
       }
     }
@@ -192,15 +206,13 @@ export default function GamePage({
       <div className="container mx-auto p-4">
         <BackButton />
         <h1 className="text-center font-mono">GANADOR:</h1>
-        <h2 className="text-center text-4xl font-extrabold">
-          {winner.name}
-        </h2>
+        <h2 className="text-center text-4xl font-extrabold">{winner.name}</h2>
         {generalaServida && (
           <p className="text-center font-mono text-yellow-500 text-lg">
             GENERALA SERVIDA
           </p>
         )}
-        
+
         <ScoreTable players={players} />
       </div>
     );
