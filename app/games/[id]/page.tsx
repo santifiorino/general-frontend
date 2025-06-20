@@ -5,10 +5,8 @@ import { Player } from "@/database/types";
 import { getGame, setScore, deleteScore } from "@/database/api";
 import { ScoreTable } from "./scoreTable";
 import { ControlPage } from "./controlPage";
-import { ChevronLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { BackButton } from "@/components/back-button";
 
 import { Score } from "@/database/types";
 
@@ -23,7 +21,6 @@ export default function GamePage({
   const [winner, setWinner] = useState<Player | null>(null);
   const [history, setHistory] = useState<Score[]>([]);
   const [generalaServida, setGeneralaServida] = useState<boolean>(false);
-  const router = useRouter();
   
   useEffect(() => {
     getGame(id).then((game) => {
@@ -138,9 +135,7 @@ export default function GamePage({
   if (winner) {
     return (
       <div className="container mx-auto p-4">
-        <Button variant="outline" className="aspect-square w-12 h-12 p-0" onClick={() => router.push("/")}>
-          <ChevronLeft className="size-6"/>
-        </Button>
+        <BackButton />
         <h1 className="text-center font-mono">GANADOR:</h1>
         <h2 className="text-center text-4xl font-extrabold">
           {winner.name}
