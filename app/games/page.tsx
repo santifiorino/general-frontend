@@ -1,12 +1,9 @@
 import { BackButton } from "@/components/back-button";
-import { Button } from "@/components/ui/button";
-import { getGames } from "@/database/api";
-import { Game } from "@/database/types";
-import { Dices } from "lucide-react";
-import Link from "next/link";
+// import { getGames } from "@/database/api";
+// import { Game } from "@/database/types";
 
 export default async function GamesPage() {
-  const games: Game[] = await getGames();
+  // const games: Game[] = await getGames();
 
   return (
     <div className="container mx-auto p-4">
