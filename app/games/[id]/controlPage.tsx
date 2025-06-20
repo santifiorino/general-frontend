@@ -91,6 +91,26 @@ export function ControlPage({
     setShowGeneralaServidaDialog(false);
   };
 
+  
+  let dialogOptions: number[] = [];
+  if (selectedScoreCategory) {
+    const currentPlayer = players[turn % players.length];
+    const baseOptions = scores[selectedScoreCategory] || [];
+    if (
+      selectedScoreCategory === "Generala" &&
+      currentPlayer["Generala Doble"] === null
+    ) { // Can't score 0 in generala if Generala Doble is not on 0 yet
+      dialogOptions = baseOptions.filter((option) => option !== 0);
+    } else if (
+      selectedScoreCategory === "Generala Doble" &&
+      currentPlayer["Generala"] !== 50
+    ) { // Can't score 100 in generala doble if Generala is not on 50 yet
+      dialogOptions = baseOptions.filter((option) => option !== 100);
+    } else {
+      dialogOptions = baseOptions;
+    }
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-center font-mono">TURNO DE</h1>
@@ -100,7 +120,7 @@ export function ControlPage({
 
       {selectedScoreCategory && (
         <ScoreDialog
-          options={scores[selectedScoreCategory] || []}
+          options={dialogOptions}
           onClose={handleCloseDialog}
           onSelectScore={onScoreSelect}
         />

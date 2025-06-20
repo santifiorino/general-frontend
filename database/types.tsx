@@ -2,6 +2,8 @@ export type Player = {
   id: string;
   name: string;
   order?: number;
+  wins?: number;
+  maxScore?: number;
   "1"?: number | null;
   "2"?: number | null;
   "3"?: number | null;
@@ -29,8 +31,8 @@ export type Score = {
   id: number;
   category: string;
   score: number;
-  player_id: number;
-  created_at: string;
+  playerId: number;
+  createdAt: string;
 };
 
 export const scores: Record<string, number[]> = {
@@ -46,4 +48,16 @@ export const scores: Record<string, number[]> = {
   "Generala": [0, 50],
   "Generala Doble": [0, 100],
   "Generala Servida": [],
+};
+
+type GeneralaServidaLog = {
+  id: number;
+  winnerName: string;
+  createdAt: Date;
+};
+
+export type Ranking = {
+  wins: Player[];
+  scores: Player[];
+  generalasServidas: GeneralaServidaLog[];
 };

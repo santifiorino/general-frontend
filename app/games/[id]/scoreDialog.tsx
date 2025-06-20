@@ -20,15 +20,16 @@ export function ScoreDialog({
 }: ScoreDialogProps) {
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Puntaje</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">Puntaje</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-2">
           {options.map((option) => (
             <Button
               key={option}
               className="text-xl p-8"
+              variant="secondary"
               onClick={() => onSelectScore(option)}
             >
               {option === 0 ? "Tachar" : option}

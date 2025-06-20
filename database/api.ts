@@ -1,4 +1,4 @@
-import { Player, Game, Score } from "./types";
+import { Player, Game, Score, Ranking } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
@@ -25,7 +25,7 @@ export async function fetchUsers(): Promise<Player[]> {
 
 export async function startGame(
   players: Player[],
-): Promise<{ gameId: string }> {
+): Promise<{ id: string }> {
   const res = await fetch(`${API_URL}/games`, {
     method: "POST",
     headers: getHeaders(),
@@ -36,8 +36,7 @@ export async function startGame(
   if (!res.ok) {
     throw new Error("Failed to start game");
   }
-  const { id } = await res.json();
-  return { gameId: id };
+  return res.json();
 }
 
 export async function getGame(gameId: string): Promise<Game> {
@@ -47,26 +46,11 @@ export async function getGame(gameId: string): Promise<Game> {
   if (!res.ok) {
     throw new Error("Failed to fetch game");
   }
-  const {
-    winner_id,
-    generala_servida,
-    created_at,
-    players,
-    scores,
-    ...gameData
-  } = await res.json();
-
-  const sortedPlayers = players.sort(
-    (a: Player, b: Player) => (a.order || 0) - (b.order || 0),
-  );
+  const game = await res.json();
 
   return {
-    ...gameData,
-    players: sortedPlayers,
-    winnerId: winner_id,
-    generalaServida: generala_servida,
-    createdAt: new Date(created_at),
-    scores: scores || [],
+    ...game,
+    createdAt: new Date(game.createdAt),
   };
 }
 
@@ -88,8 +72,8 @@ export async function setScore(
   if (!res.ok) {
     throw new Error("Failed to set score");
   }
-  const { winner_id, ...scoreData } = await res.json();
-  return { winnerId: winner_id, score: scoreData as Score };
+  const { winnerId, ...scoreData } = await res.json();
+  return { winnerId, score: scoreData as Score };
 }
 
 export async function deleteScore(
@@ -107,4 +91,11 @@ export async function deleteScore(
   if (!res.ok) {
     throw new Error("Failed to delete score");
   }
+}
+
+export async function getRankings(): Promise<Ranking> {
+  const res = await fetch(`${API_URL}/rankings`, {
+    headers: getHeaders(),
+  });
+  return res.json();
 }
