@@ -189,11 +189,9 @@ export function DataTable({
   const selectedPlayers = React.useMemo(() => {
     return table
       .getSelectedRowModel()
-      .rows.map((row) =>
-        data.find((player) => player.id === row.original.id)
-      )
+      .rows.map((row) => data.find((player) => player.id === row.original.id))
       .filter((player): player is Player => player !== undefined);
-  }, [data, rowSelection, table]);
+  }, [data, table]);
 
   const handleStartGame = () => {
     if (selectedPlayers.length > 0) {
