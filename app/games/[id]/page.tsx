@@ -1,0 +1,158 @@
+"use client";
+
+import { useState, useEffect, use } from "react";
+import { Player } from "@/database/types";
+import { getGame, setScore, deleteScore } from "@/database/api";
+import { ScoreTable } from "./scoreTable";
+import { ControlPage } from "./controlPage";
+import { ChevronLeft } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+
+import { Score } from "@/database/types";
+
+export default function GamePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const [turn, setTurn] = useState<number>(0);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [winner, setWinner] = useState<Player | null>(null);
+  const [history, setHistory] = useState<Score[]>([]);
+  const [generalaServida, setGeneralaServida] = useState<boolean>(false);
+  const router = useRouter();
+  
+  useEffect(() => {
+    getGame(id).then((game) => {
+      const gamePlayers = game.players.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      setPlayers(gamePlayers);
+      setTurn(game.turn);
+      setHistory(game.scores);
+      setGeneralaServida(game.generalaServida);
+
+      if (game.winnerId) {
+        const winnerPlayer = game.players.find((p) => p.id === game.winnerId);
+        setWinner(winnerPlayer || null);
+      } else {
+        setWinner(null);
+      }
+    });
+  }, [id]);
+
+  const handleScoreSelect = async (value: number, category: string) => {
+    const scoreData = {
+      playerId: players[turn % players.length].id,
+      score: value,
+      scoreCategory: category,
+    };
+
+    setPlayers(
+      players.map((player, index) => {
+        if (index === turn % players.length) {
+          return { ...player, [category]: value };
+        }
+        return player;
+      })
+    );
+    
+    setTurn(turn + 1);
+
+    const result = await setScore(id, scoreData);
+    
+    setHistory([...history, result.score]);
+
+    if (result && result.winnerId) {
+      const winnerPlayer = players.find((p) => p.id === result.winnerId);
+      if (winnerPlayer) {
+        setWinner(winnerPlayer);
+      }
+    }
+
+    if (category === "Generala Servida") {
+      setGeneralaServida(true);
+    }
+  };
+
+  const handleUndo = async () => {
+    const lastScore = history[history.length - 1];
+    if (!lastScore) return;
+
+    const lastPlayer = players[(turn - 1) % players.length];
+
+    await deleteScore(
+      id,
+      lastPlayer.id,
+      lastScore.category
+    );
+
+    setHistory(history.slice(0, -1));
+    setPlayers(
+      players.map((player) => {
+        if (player.id === lastPlayer.id) {
+          return { ...player, [lastScore.category]: null };
+        }
+        return player;
+      })
+    );
+    setTurn(turn - 1);
+    setWinner(null);
+  };
+
+  if (winner) {
+    return (
+      <div className="container mx-auto p-4">
+        <Button variant="outline" className="aspect-square w-12 h-12 p-0" onClick={() => router.push("/")}>
+          <ChevronLeft className="size-6"/>
+        </Button>
+        <h1 className="text-center font-mono">GANADOR:</h1>
+        <h2 className="text-center text-4xl font-extrabold">
+          {winner.name}
+        </h2>
+        {generalaServida && (
+          <p className="text-center font-mono text-yellow-500 text-lg mt-2 mb-4">
+            GENERALA SERVIDA
+          </p>
+        )}
+        
+        <ScoreTable players={players} />
+      </div>
+    );
+  }
+
+  if (players.length === 0) {
+    return (
+      <div className="container mx-auto p-4">
+        <h1>Cargando...</h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex justify-center">
+      <Tabs defaultValue="control" className="w-[400px] mt-4">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="control">Control</TabsTrigger>
+          <TabsTrigger value="scoreTable">Tabla</TabsTrigger>
+        </TabsList>
+        <TabsContent value="control">
+          <ControlPage
+            players={players}
+            turn={turn}
+            handleScoreSelect={handleScoreSelect}
+            handleUndo={handleUndo}
+            undoDisabled={history.length === 0}
+          />
+        </TabsContent>
+        <TabsContent value="scoreTable">
+          <div className="container">
+            <h1 className="text-center font-mono my-4">TABLA DE PUNTOS</h1>
+            <ScoreTable players={players} />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
