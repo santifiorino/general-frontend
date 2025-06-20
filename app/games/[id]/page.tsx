@@ -62,7 +62,13 @@ export default function GamePage({
 
     const result = await setScore(id, scoreData);
     
-    setHistory([...history, result.score]);
+    const newScore: Score = {
+      ...result.score,
+      category: category,
+      score: value,
+    };
+    
+    setHistory([...history, newScore]);
 
     if (result && result.winnerId) {
       const winnerPlayer = players.find((p) => p.id === result.winnerId);
@@ -100,6 +106,34 @@ export default function GamePage({
     setTurn(turn - 1);
     setWinner(null);
   };
+
+  const lastScore = history.length > 0 ? history[history.length - 1] : null;
+  const lastPlayer =
+    lastScore && players.length > 0
+      ? players[(turn - 1) % players.length]
+      : null;
+
+  let undoText = "";
+  if (lastScore && lastPlayer) {
+    const { category, score } = lastScore;
+    const playerName = lastPlayer.name;
+    const isNumberCategory = ["1", "2", "3", "4", "5", "6"].includes(category);
+
+    if (score === 0) {
+      let article = ["Escalera", "Generala", "Generala Doble"].includes(category) ? "la" : "el";
+      undoText = `${playerName} tachó ${article} ${category}`;
+    } else if (isNumberCategory) {
+      undoText = `${playerName} anotó ${score} al ${category}`;
+    } else {
+      if (score % 10 === 5) { // Servido
+        const letter = ["Escalera", "Generala", "Generala Doble"].includes(category) ? "a" : "o";
+        let servidoText = "Servid" + letter;
+        undoText = `${playerName} anotó ${category} ${servidoText}`;
+      } else { // No servido
+        undoText = `${playerName} anotó ${category}`;
+      }
+    }
+  }
 
   if (winner) {
     return (
@@ -144,6 +178,7 @@ export default function GamePage({
             handleScoreSelect={handleScoreSelect}
             handleUndo={handleUndo}
             undoDisabled={history.length === 0}
+            undoText={undoText}
           />
         </TabsContent>
         <TabsContent value="scoreTable">

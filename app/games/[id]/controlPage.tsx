@@ -57,6 +57,7 @@ interface ControlPageProps {
   handleScoreSelect: (value: number, category: string) => void;
   handleUndo: () => void;
   undoDisabled: boolean;
+  undoText?: string;
 }
 
 export function ControlPage({
@@ -65,6 +66,7 @@ export function ControlPage({
   handleScoreSelect,
   handleUndo,
   undoDisabled,
+  undoText,
 }: ControlPageProps) {
   const [selectedScoreCategory, setSelectedScoreCategory] = useState<
     string | null
@@ -208,8 +210,18 @@ export function ControlPage({
           />
         </div>
       </div>
-      <Button variant="default" className="w-full mt-4" onClick={handleUndo} disabled={undoDisabled}>
-        Deshacer
+      <Button
+        variant="default"
+        className="w-full mt-4 h-auto"
+        onClick={handleUndo}
+        disabled={undoDisabled}
+      >
+        <div className="flex flex-col">
+          <span className="font-bold">Deshacer</span>
+          {!undoDisabled && undoText && (
+            <span className="text-xs font-thin normal-case">({undoText})</span>
+          )}
+        </div>
       </Button>
     </div>
   );
