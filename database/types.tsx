@@ -50,7 +50,7 @@ export const scores: Record<string, number[]> = {
   "Generala Servida": [],
 };
 
-type GeneralaServidaLog = {
+export type GeneralaServidaLog = {
   id: number;
   winnerName: string;
   createdAt: Date;
