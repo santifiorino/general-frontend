@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 
 interface GeneralaServidaDialogProps {
   playerName: string;
+  ranked: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 export function GeneralaServidaDialog({
   playerName,
+  ranked,
   onClose,
   onConfirm,
 }: GeneralaServidaDialogProps) {
@@ -27,8 +29,8 @@ export function GeneralaServidaDialog({
         <div className="flex flex-col gap-4">
           <p className="text-lg">
             Confirmar que <span className="font-bold">{playerName}</span> obtuvo
-            una generala servida. Esto terminará la partida inmediatamente y le
-            dará 2 victorias (en caso de ser una partida de 5 jugadores o más).
+            una generala servida. Esto terminará la partida inmediatamente
+            {ranked ? " y le dará 2 victorias." : "."}
           </p>
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1" onClick={onClose}>

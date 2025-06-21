@@ -33,7 +33,7 @@ export default async function GamesPage() {
       <div className="space-y-4">
         {games.map((game) => (
           <Link
-            href={`/games/${game.id}`}
+            href={`/games/${game.id}?back_to=/games`}
             key={game.id}
             className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted"
           >
@@ -99,8 +99,7 @@ export default async function GamesPage() {
       </div>
       <div className="flex justify-center mt-4 text-muted-foreground text-sm">
         El registro oficial de partidas comenzó el 20 de Junio de 2025. Las 29
-        partidas anteriores están incluidas en el
-        ranking.
+        partidas anteriores están incluidas en el ranking.
       </div>
     </div>
   );

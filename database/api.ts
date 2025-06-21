@@ -119,7 +119,7 @@ export async function getGames(): Promise<Game[]> {
     cache: "no-store",
   });
   const games = await res.json();
-  return games.map((game: any) => ({
+  return games.map((game: Game) => ({
     ...game,
     createdAt: new Date(game.createdAt),
   }));

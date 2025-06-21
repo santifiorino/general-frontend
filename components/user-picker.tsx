@@ -137,15 +137,16 @@ function DraggableRow({ row }: { row: Row<Player> }) {
 export function DataTable({
   data: initialData,
   onStartGame,
+  isCreatingGame,
 }: {
   data: Player[];
-  onStartGame: (selectedPlayers: Player[]) => Promise<void>;
+  onStartGame: (selectedPlayers: Player[]) => void;
+  isCreatingGame: boolean;
 }) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState<
     Record<string, boolean>
   >({});
-  const [isStartingGame, setIsStartingGame] = React.useState(false);
 
   React.useEffect(() => {
     setData(initialData);
@@ -185,15 +186,9 @@ export function DataTable({
     return data.filter((player) => rowSelection[player.id]);
   }, [data, rowSelection]);
 
-  const handleStartGame = async () => {
+  const handleStartGame = () => {
     if (selectedPlayers.length > 0) {
-      setIsStartingGame(true);
-      try {
-        await onStartGame(selectedPlayers);
-      } catch (error) {
-        console.error(error);
-        setIsStartingGame(false);
-      }
+      onStartGame(selectedPlayers);
     }
   };
 
@@ -281,9 +276,9 @@ export function DataTable({
         </div>
         <Button
           onClick={handleStartGame}
-          disabled={selectedPlayers.length < 2 || isStartingGame}
+          disabled={selectedPlayers.length < 2 || isCreatingGame}
         >
-          {isStartingGame ? "Comenzando..." : "Comenzar Partida"}
+          {isCreatingGame ? "Comenzando..." : "Comenzar Partida"}
         </Button>
       </div>
     </div>

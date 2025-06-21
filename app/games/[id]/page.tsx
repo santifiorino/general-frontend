@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Player } from "@/database/types";
 import {
   getGame,
@@ -12,7 +13,7 @@ import { ScoreTable } from "./scoreTable";
 import { ControlPage } from "./controlPage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BackButton } from "@/components/back-button";
-import { TieBreakDialog } from "./tieBreakDialog";
+import { TieBreakDialog } from "@/components/tieBreakDialog";
 
 import { Score, scores } from "@/database/types";
 
@@ -22,6 +23,8 @@ export default function GamePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
+  const backTo = searchParams.get("back_to");
   const [turn, setTurn] = useState<number>(0);
   const [players, setPlayers] = useState<Player[]>([]);
   const [winner, setWinner] = useState<Player | null>(null);
@@ -48,14 +51,17 @@ export default function GamePage({
     });
   }, [id]);
 
-  const handleSetWinner = async (winnerId: string) => {
-    await apiSetWinner(id, winnerId);
-    const winnerPlayer = players.find((p) => p.id === winnerId);
-    if (winnerPlayer) {
-      setWinner(winnerPlayer);
-    }
-    setTiedPlayers([]);
-  };
+  const handleSetWinner = useCallback(
+    async (winnerId: string) => {
+      await apiSetWinner(id, winnerId);
+      const winnerPlayer = players.find((p) => p.id === winnerId);
+      if (winnerPlayer) {
+        setWinner(winnerPlayer);
+      }
+      setTiedPlayers([]);
+    },
+    [id, players],
+  );
 
   useEffect(() => {
     if (
@@ -203,7 +209,7 @@ export default function GamePage({
   if (winner) {
     return (
       <div className="container mx-auto p-4">
-        <BackButton />
+        <BackButton href={backTo || "/"} />
         <h1 className="text-center font-mono">GANADOR:</h1>
         <h2 className="text-center text-4xl font-extrabold">{winner.name}</h2>
         {generalaServida && (

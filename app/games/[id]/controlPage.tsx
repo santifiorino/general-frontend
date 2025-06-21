@@ -3,8 +3,8 @@
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Player, scores } from "@/database/types";
-import { ScoreDialog } from "./scoreDialog";
-import { GeneralaServidaDialog } from "./generalaServidaDialog";
+import { ScoreDialog } from "@/components/scoreDialog";
+import { GeneralaServidaDialog } from "@/components/generalaServidaDialog";
 import React, { useState } from "react";
 
 function StringButton({
@@ -133,6 +133,7 @@ export function ControlPage({
       {showGeneralaServidaDialog && (
         <GeneralaServidaDialog
           playerName={players[turn % players.length].name}
+          ranked={players.length > 4}
           onClose={handleCloseGeneralaServidaDialog}
           onConfirm={onGeneralaServidaConfirm}
         />

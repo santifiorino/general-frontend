@@ -10,6 +10,7 @@ import { BackButton } from "@/components/back-button";
 
 export default function NewGamePage() {
   const [users, setUsers] = useState<Player[]>([]);
+  const [isCreatingGame, setIsCreatingGame] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function NewGamePage() {
   }, []);
 
   const handleStartGame = async (selectedPlayers: Player[]) => {
+    setIsCreatingGame(true);
     const result = await startGame(selectedPlayers);
     router.push(`/games/${result.id}`);
   };
@@ -28,7 +30,11 @@ export default function NewGamePage() {
       <p className="text-sm text-muted-foreground mb-4">
         Selecciona y ordena los jugadores que participarán en la partida.
       </p>
-      <DataTable data={users} onStartGame={handleStartGame} />
+      <DataTable
+        data={users}
+        onStartGame={handleStartGame}
+        isCreatingGame={isCreatingGame}
+      />
     </div>
   );
 }
