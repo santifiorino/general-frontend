@@ -210,17 +210,21 @@ export function ControlPage({
           />
         </div>
       </div>
+      <div className="mt-4 mb-2">
+        {!undoDisabled && undoText && (
+          <span className="text-sm">
+            <span className="font-bold">Turno anterior:</span> {undoText}
+          </span>
+        )}
+      </div>
       <Button
         variant="default"
-        className="w-full mt-4 h-auto"
+        className="w-full h-auto"
         onClick={handleUndo}
         disabled={undoDisabled}
       >
         <div className="flex flex-col">
           <span className="font-bold">Deshacer</span>
-          {!undoDisabled && undoText && (
-            <span className="text-xs">({undoText})</span>
-          )}
         </div>
       </Button>
     </div>

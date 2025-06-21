@@ -24,7 +24,7 @@ export default function NewGamePage() {
   return (
     <div className="container mx-auto p-4">
       <BackButton />
-      <h1 className="text-2xl font-bold mb-4 mt-4">Nueva Partida</h1>
+      <h1 className="text-2xl font-bold mb-2 mt-4">Nueva Partida</h1>
       <p className="text-sm text-muted-foreground mb-4">
         Selecciona y ordena los jugadores que participarán en la partida.
       </p>

@@ -1,7 +1,7 @@
 import { BackButton } from "@/components/back-button";
 import { getGames } from "@/database/api";
 import { Game } from "@/database/types";
-import { Trophy, BadgeCheck, BadgeX, CircleAlert } from "lucide-react";
+import { Award, Trophy, BadgeCheck, BadgeX, CircleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
@@ -22,11 +22,13 @@ export default async function GamesPage() {
     return `${day} de ${capitalizedMonth} del ${year}, ${hours}:${minutes}`;
   };
 
+  console.log(games);
+
   return (
     <div className="container mx-auto p-4">
       <BackButton />
-      <h1 className="text-4xl font-bold my-4">Games</h1>
-      <div className="text-muted-foreground text-sm mb-4">
+      <h1 className="text-4xl font-bold mt-4 mb-4">Games</h1>
+      <div className="text-muted-foreground text-sm mb-2">
         <p>Total: {totalGames}</p>
         <p>Ranked: {rankedGames}</p>
       </div>
@@ -41,42 +43,44 @@ export default async function GamesPage() {
               <h2 className="text-xl font-semibold mb-2">
                 {formatDateTime(new Date(game.createdAt))}
               </h2>
-              {game.players.length > 4 && (
-                <Badge
-                  variant={"outline"}
-                  className="text-sm font-mono text-green-500"
-                >
-                  <BadgeCheck className="h-4 w-4" />
-                  RANKED
-                </Badge>
-              )}
-              {game.players.length < 5 && (
-                <Badge
-                  variant={"outline"}
-                  className="text-sm font-mono text-muted-foreground"
-                >
-                  <BadgeX className="h-4 w-4" />
-                  UNRANKED
-                </Badge>
-              )}
-              {game.generalaServida && (
-                <Badge
-                  variant={"outline"}
-                  className="text-sm font-mono text-yellow-500"
-                >
-                  <Trophy className="h-4 w-4" />
-                  GENERALA SERVIDA
-                </Badge>
-              )}
-              {game.winnerId == null && (
-                <Badge
-                  variant={"outline"}
-                  className="text-sm font-mono text-red-500"
-                >
-                  <CircleAlert className="h-4 w-4" />
-                  SIN FINALIZAR
-                </Badge>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {game.players.length > 4 && (
+                  <Badge
+                    variant={"outline"}
+                    className="text-sm font-mono text-green-500"
+                  >
+                    <BadgeCheck className="h-4 w-4" />
+                    RANKED
+                  </Badge>
+                )}
+                {game.players.length < 5 && (
+                  <Badge
+                    variant={"outline"}
+                    className="text-sm font-mono text-muted-foreground"
+                  >
+                    <BadgeX className="h-4 w-4" />
+                    UNRANKED
+                  </Badge>
+                )}
+                {game.generalaServida && (
+                  <Badge
+                    variant={"outline"}
+                    className="text-sm font-mono text-yellow-500"
+                  >
+                    <Trophy className="h-4 w-4" />
+                    GENERALA SERVIDA
+                  </Badge>
+                )}
+                {game.winnerId == null && (
+                  <Badge
+                    variant={"outline"}
+                    className="text-sm font-mono text-red-500"
+                  >
+                    <CircleAlert className="h-4 w-4" />
+                    SIN FINALIZAR
+                  </Badge>
+                )}
+              </div>
               <Separator className="my-3" />
               <div className="flex flex-wrap gap-2 mt-2">
                 {game.players.map((player) => (
@@ -84,6 +88,9 @@ export default async function GamesPage() {
                     key={player.id}
                     variant={game.winnerId === player.id ? "gold" : "outline"}
                   >
+                    {game.winnerId === player.id && (
+                      <Award className="h-4 w-4" />
+                    )}
                     {player.name}
                   </Badge>
                 ))}
