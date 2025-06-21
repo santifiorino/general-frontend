@@ -22,8 +22,6 @@ export default async function GamesPage() {
     return `${day} de ${capitalizedMonth} del ${year}, ${hours}:${minutes}`;
   };
 
-  console.log(games);
-
   return (
     <div className="container mx-auto p-4">
       <BackButton />

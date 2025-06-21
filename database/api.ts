@@ -115,6 +115,7 @@ export async function getRankings(): Promise<Ranking> {
 export async function getGames(): Promise<Game[]> {
   const res = await fetch(`${API_URL}/games`, {
     headers: getHeaders(),
+    cache: "no-store",
   });
   const games = await res.json();
   return games.map((game: any) => ({
