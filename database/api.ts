@@ -108,6 +108,7 @@ export async function setWinner(
 export async function getRankings(): Promise<Ranking> {
   const res = await fetch(`${API_URL}/rankings`, {
     headers: getHeaders(),
+    cache: "no-store",
   });
   return res.json();
 }

@@ -25,7 +25,7 @@ export default async function GamesPage() {
   return (
     <div className="container mx-auto p-4">
       <BackButton />
-      <h1 className="text-4xl font-bold mt-4 mb-4">Games</h1>
+      <h1 className="text-4xl font-bold mt-4 mb-4">Historial</h1>
       <div className="text-muted-foreground text-sm mb-2">
         <p>Total: {totalGames + 29}</p>
         <p>Ranked: {rankedGames + 29}</p>
