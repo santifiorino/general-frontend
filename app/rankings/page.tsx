@@ -1,4 +1,3 @@
-import { getRankings } from "@/database/api";
 import { Ranking } from "@/database/types";
 import { BackButton } from "@/components/back-button";
 

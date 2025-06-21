@@ -1,7 +1,7 @@
 import { BackButton } from "@/components/back-button";
 import { getGames } from "@/database/api";
 import { Game } from "@/database/types";
-import { ChevronRight, Trophy, BadgeCheck, BadgeX, CircleAlert } from "lucide-react";
+import { Trophy, BadgeCheck, BadgeX, CircleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
