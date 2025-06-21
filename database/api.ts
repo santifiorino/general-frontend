@@ -116,5 +116,9 @@ export async function getGames(): Promise<Game[]> {
   const res = await fetch(`${API_URL}/games`, {
     headers: getHeaders(),
   });
-  return res.json();
+  const games = await res.json();
+  return games.map((game: any) => ({
+    ...game,
+    createdAt: new Date(game.createdAt),
+  }));
 }

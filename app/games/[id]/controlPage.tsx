@@ -219,7 +219,7 @@ export function ControlPage({
         <div className="flex flex-col">
           <span className="font-bold">Deshacer</span>
           {!undoDisabled && undoText && (
-            <span className="text-xs font-thin normal-case">({undoText})</span>
+            <span className="text-xs">({undoText})</span>
           )}
         </div>
       </Button>
