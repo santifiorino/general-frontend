@@ -139,12 +139,13 @@ export function DataTable({
   onStartGame,
 }: {
   data: Player[];
-  onStartGame: (selectedPlayers: Player[]) => void;
+  onStartGame: (selectedPlayers: Player[]) => Promise<void>;
 }) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState<
     Record<string, boolean>
   >({});
+  const [isStartingGame, setIsStartingGame] = React.useState(false);
 
   React.useEffect(() => {
     setData(initialData);
@@ -184,9 +185,15 @@ export function DataTable({
     return data.filter((player) => rowSelection[player.id]);
   }, [data, rowSelection]);
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (selectedPlayers.length > 0) {
-      onStartGame(selectedPlayers);
+      setIsStartingGame(true);
+      try {
+        await onStartGame(selectedPlayers);
+      } catch (error) {
+        console.error(error);
+        setIsStartingGame(false);
+      }
     }
   };
 
@@ -272,8 +279,11 @@ export function DataTable({
           {selectedPlayers.length !== 1 ? "es" : ""} seleccionado
           {selectedPlayers.length !== 1 ? "s" : ""}
         </div>
-        <Button onClick={handleStartGame} disabled={selectedPlayers.length < 2}>
-          Comenzar Partida
+        <Button
+          onClick={handleStartGame}
+          disabled={selectedPlayers.length < 2 || isStartingGame}
+        >
+          {isStartingGame ? "Comenzando..." : "Comenzar Partida"}
         </Button>
       </div>
     </div>

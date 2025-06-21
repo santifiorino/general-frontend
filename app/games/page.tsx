@@ -27,8 +27,8 @@ export default async function GamesPage() {
       <BackButton />
       <h1 className="text-4xl font-bold mt-4 mb-4">Games</h1>
       <div className="text-muted-foreground text-sm mb-2">
-        <p>Total: {totalGames}</p>
-        <p>Ranked: {rankedGames}</p>
+        <p>Total: {totalGames + 29}</p>
+        <p>Ranked: {rankedGames + 29}</p>
       </div>
       <div className="space-y-4">
         {games.map((game) => (
@@ -96,6 +96,11 @@ export default async function GamesPage() {
             </div>
           </Link>
         ))}
+      </div>
+      <div className="flex justify-center mt-4 text-muted-foreground text-sm">
+        El registro oficial de partidas comenzó el 20 de Junio de 2025. Las 29
+        partidas anteriores están incluidas en el
+        ranking.
       </div>
     </div>
   );
