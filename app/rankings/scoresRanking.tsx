@@ -22,7 +22,7 @@ const top3Styles = [
 export default function ScoresRanking({ players }: ScoresRankingProps) {
   return (
     <div className="rounded-xl border bg-card text-card-foreground shadow">
-      <div className="p-6 text-center">
+      <div className="p-6">
         <h2 className="text-2xl font-bold">Puntaje Máximo</h2>
       </div>
       <div className="p-6 pt-0">

@@ -5,6 +5,7 @@ import { BackButton } from "@/components/back-button";
 import ScoresRanking from "./scoresRanking";
 import GeneralasServidasRanking from "./generalasServidasRanking";
 import WinsByYearRanking from "./winsByYearRanking";
+import YearlyTopWinners from "./yearlyTopWinners";
 
 export default async function Rankings() {
   const rankings: Ranking = await getRankings();
@@ -35,6 +36,7 @@ export default async function Rankings() {
           totalsPlayers={totalsPlayers}
         />
         <ScoresRanking players={rankings.scores} />
+        <YearlyTopWinners winsByKey={rankings.wins} />
         <GeneralasServidasRanking
           generalasServidas={rankings.generalasServidas}
         />

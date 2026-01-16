@@ -26,7 +26,7 @@ export default function GeneralasServidasRanking({
 
   return (
     <div className="rounded-xl border bg-card text-card-foreground shadow">
-      <div className="p-6 text-center">
+      <div className="p-6">
         <h2 className="text-2xl font-bold">Generalas Servidas</h2>
       </div>
       <div className="p-6 pt-0">
