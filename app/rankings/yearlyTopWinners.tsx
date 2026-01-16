@@ -34,7 +34,7 @@ export default function YearlyTopWinners({ winsByKey }: YearlyTopWinnersProps) {
   return (
     <div className="rounded-xl border bg-card text-card-foreground shadow">
       <div className="p-6">
-        <h2 className="text-2xl font-bold">Ganadores por año</h2>
+        <h2 className="text-2xl font-bold">Ganadores Históricos</h2>
       </div>
       <div className="p-6 pt-0">
         <Table>
