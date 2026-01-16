@@ -53,7 +53,7 @@ export async function getGame(gameId: string): Promise<Game> {
 
 export async function setScore(
   gameId: string,
-  score: { playerId: string; scoreCategory: string; score: number },
+  score: { playerId: string; scoreCategory: string; score: number }
 ): Promise<{ winnerId: string[]; score: Score }> {
   const res = await fetch(
     `${API_URL}/games/${gameId}/players/${score.playerId}/scores`,
@@ -64,7 +64,7 @@ export async function setScore(
         category: score.scoreCategory,
         score: score.score,
       }),
-    },
+    }
   );
   if (!res.ok) {
     throw new Error("Failed to set score");
@@ -76,14 +76,14 @@ export async function setScore(
 export async function deleteScore(
   gameId: string,
   playerId: string,
-  category: string,
+  category: string
 ): Promise<void> {
   const res = await fetch(
     `${API_URL}/games/${gameId}/players/${playerId}/scores/${category}`,
     {
       method: "DELETE",
       headers: getHeaders(),
-    },
+    }
   );
   if (!res.ok) {
     throw new Error("Failed to delete score");
@@ -92,7 +92,7 @@ export async function deleteScore(
 
 export async function setWinner(
   gameId: string,
-  winnerId: string,
+  winnerId: string
 ): Promise<void> {
   const res = await fetch(`${API_URL}/games/${gameId}`, {
     method: "PATCH",
@@ -111,6 +111,63 @@ export async function getRankings(): Promise<Ranking> {
     cache: "no-store",
   });
   return res.json();
+}
+
+export function convertWinsToPlayers(winsInput: unknown): Player[] {
+  if (Array.isArray(winsInput)) {
+    const arr = winsInput as Array<Partial<Player>>;
+    const normalized = arr.map((p, idx) => ({
+      id: String(p?.id ?? p?.name ?? idx),
+      name: String(p?.name ?? p?.id ?? `Jugador ${idx + 1}`),
+      wins: typeof p?.wins === "number" ? p.wins : 0,
+    }));
+    normalized.sort((a, b) => (b.wins ?? 0) - (a.wins ?? 0));
+    return normalized;
+  }
+
+  if (winsInput && typeof winsInput === "object") {
+    const entries = Object.entries(winsInput as Record<string, unknown>);
+    const players: Player[] = entries.map(([key, value], idx) => {
+      if (typeof value === "number") {
+        return { id: key, name: key, wins: value };
+      }
+      if (value && typeof value === "object") {
+        const obj = value as Record<string, unknown>;
+        const winsVal =
+          typeof obj.wins === "number"
+            ? (obj.wins as number)
+            : typeof (obj as Player).wins === "number"
+              ? ((obj as Player).wins as number)
+              : 0;
+        const nameVal =
+          typeof obj.name === "string" ? (obj.name as string) : key;
+        const idVal =
+          typeof obj.id === "string"
+            ? (obj.id as string)
+            : String(obj.id ?? nameVal ?? key ?? idx);
+        return { id: idVal, name: nameVal, wins: winsVal };
+      }
+      return { id: key, name: key, wins: 0 };
+    });
+    players.sort((a, b) => (b.wins ?? 0) - (a.wins ?? 0));
+    return players;
+  }
+
+  return [];
+}
+
+export async function getRankingsByYear(
+  year: number
+): Promise<{ wins: Player[] }> {
+  // Fetch the full rankings and extract the requested year locally to avoid
+  // depending on backend query params support.
+  const rankings = await getRankings();
+  const yearKey = String(year);
+  const yearWinsMap =
+    (rankings.wins && rankings.wins[yearKey]) !== undefined
+      ? rankings.wins[yearKey]
+      : {};
+  return { wins: convertWinsToPlayers(yearWinsMap ?? {}) };
 }
 
 export async function getGames(): Promise<Game[]> {

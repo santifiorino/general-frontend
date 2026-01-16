@@ -23,7 +23,7 @@ export default function WinsRanking({ players }: WinsRankingProps) {
   return (
     <div className="rounded-xl border bg-card text-card-foreground shadow">
       <div className="p-6 text-center">
-        <h2 className="text-2xl font-bold">Victorias</h2>
+        <h2 className="text-2xl font-bold">Victorias totales</h2>
       </div>
       <div className="p-6 pt-0">
         <Table>

@@ -57,7 +57,7 @@ export type GeneralaServidaLog = {
 };
 
 export type Ranking = {
-  wins: Player[];
+  wins: Record<string, Record<string, number>>;
   scores: Player[];
   generalasServidas: GeneralaServidaLog[];
 };
