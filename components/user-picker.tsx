@@ -5,7 +5,13 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { GripVertical, AlertCircleIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { GripVertical, AlertCircleIcon, UserPlus, X } from "lucide-react";
 import { Player } from "@/database/types";
 
 import {
@@ -64,42 +70,68 @@ function DragHandle({ id }: { id: string }) {
   );
 }
 
-const columns: ColumnDef<Player>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-    size: 50,
-  },
-  {
-    id: "select",
-    header: () => (
-      <div className="flex items-center justify-center w-full">Juega</div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center w-full">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    size: 60,
-  },
-  {
-    accessorKey: "name",
-    header: "Nombre",
-    cell: ({ row }) => (
-      <div
-        className="cursor-pointer hover:bg-muted/50 px-2 py-1 rounded transition-colors"
-        onClick={() => row.toggleSelected(!row.getIsSelected())}
-      >
-        {row.original.name}
-      </div>
-    ),
-  },
-];
+function makeColumns(onRemoveGuest: (id: string) => void): ColumnDef<Player>[] {
+  return [
+    {
+      id: "drag",
+      header: () => null,
+      cell: ({ row }) => <DragHandle id={row.original.id} />,
+      size: 50,
+    },
+    {
+      id: "select",
+      header: () => (
+        <div className="flex items-center justify-center w-full">Juega</div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center w-full">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      size: 60,
+    },
+    {
+      accessorKey: "name",
+      header: "Nombre",
+      cell: ({ row }) => (
+        <div
+          className="cursor-pointer hover:bg-muted/50 px-2 py-1 rounded transition-colors flex items-center gap-2"
+          onClick={() => row.toggleSelected(!row.getIsSelected())}
+        >
+          {row.original.name}
+          {row.original.isGuest && (
+            <span className="text-xs text-muted-foreground italic">
+              (invitado)
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      header: () => null,
+      cell: ({ row }) =>
+        row.original.isGuest ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemoveGuest(row.original.id);
+            }}
+          >
+            <X className="size-4" />
+          </Button>
+        ) : null,
+      size: 40,
+    },
+  ];
+}
 
 function DraggableRow({ row }: { row: Row<Player> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -124,7 +156,9 @@ function DraggableRow({ row }: { row: Row<Player> }) {
               ? "w-12 p-2"
               : cell.column.id === "select"
                 ? "w-16 p-0"
-                : "p-2"
+                : cell.column.id === "actions"
+                  ? "w-10 p-0"
+                  : "p-2"
           }
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -147,10 +181,27 @@ export function DataTable({
   const [rowSelection, setRowSelection] = React.useState<
     Record<string, boolean>
   >({});
+  const [showGuestDialog, setShowGuestDialog] = React.useState(false);
+  const [guestName, setGuestName] = React.useState("");
+  const guestCounter = React.useRef(0);
 
   React.useEffect(() => {
     setData(initialData);
   }, [initialData]);
+
+  const handleRemoveGuest = React.useCallback((id: string) => {
+    setData((prev) => prev.filter((p) => p.id !== id));
+    setRowSelection((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }, []);
+
+  const columns = React.useMemo(
+    () => makeColumns(handleRemoveGuest),
+    [handleRemoveGuest],
+  );
 
   const sortableId = React.useId();
   const sensors = useSensors(
@@ -182,9 +233,25 @@ export function DataTable({
     }
   }
 
+  const handleAddGuest = () => {
+    const trimmed = guestName.trim();
+    if (!trimmed) return;
+    guestCounter.current += 1;
+    const guestId = `guest-${Date.now()}-${guestCounter.current}`;
+    const guest: Player = { id: guestId, name: trimmed, isGuest: true };
+    setData((prev) => [...prev, guest]);
+    setRowSelection((prev) => ({ ...prev, [guestId]: true }));
+    setGuestName("");
+    setShowGuestDialog(false);
+  };
+
   const selectedPlayers = React.useMemo(() => {
     return data.filter((player) => rowSelection[player.id]);
   }, [data, rowSelection]);
+
+  const selectedDefinedCount = React.useMemo(() => {
+    return selectedPlayers.filter((p) => !p.isGuest).length;
+  }, [selectedPlayers]);
 
   const handleStartGame = () => {
     if (selectedPlayers.length > 0) {
@@ -194,14 +261,20 @@ export function DataTable({
 
   return (
     <div className="space-y-4">
-      {selectedPlayers.length >= 2 && selectedPlayers.length <= 4 && (
+      {selectedPlayers.length >= 2 && selectedDefinedCount <= 4 && (
         <Alert variant="destructive">
           <AlertCircleIcon />
           <AlertTitle>Los resultados no afectarán el ranking.</AlertTitle>
           <AlertDescription>
-            Selecciona al menos {5 - selectedPlayers.length} jugador
-            {5 - selectedPlayers.length !== 1 ? "es" : ""} más para que la
-            partida sea oficial.
+            {selectedDefinedCount < 5 && (
+              <>
+                Selecciona al menos {5 - selectedDefinedCount} jugador
+                {5 - selectedDefinedCount !== 1 ? "es" : ""} definido
+                {5 - selectedDefinedCount !== 1 ? "s" : ""} más para que la
+                partida sea oficial. Los invitados no cuentan para este
+                requisito.
+              </>
+            )}
           </AlertDescription>
         </Alert>
       )}
@@ -228,7 +301,9 @@ export function DataTable({
                             ? "w-12 p-2"
                             : header.id === "select"
                               ? "w-16 p-0"
-                              : "p-2"
+                              : header.id === "actions"
+                                ? "w-10 p-0"
+                                : "p-2"
                         }
                       >
                         {header.isPlaceholder
@@ -267,6 +342,59 @@ export function DataTable({
           </Table>
         </DndContext>
       </div>
+
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => setShowGuestDialog(true)}
+      >
+        <UserPlus className="size-4 mr-2" />
+        Agregar invitado
+      </Button>
+
+      <Dialog open={showGuestDialog} onOpenChange={setShowGuestDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Agregar invitado</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAddGuest();
+            }}
+            className="flex flex-col gap-4"
+          >
+            <input
+              autoFocus
+              type="text"
+              placeholder="Nombre del invitado"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setGuestName("");
+                  setShowGuestDialog(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={!guestName.trim()}
+              >
+                Agregar
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <div className="flex justify-between items-center">
         <div className="text-sm text-muted-foreground">

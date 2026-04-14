@@ -133,7 +133,10 @@ export function ControlPage({
       {showGeneralaServidaDialog && (
         <GeneralaServidaDialog
           playerName={players[turn % players.length].name}
-          ranked={players.length > 4}
+          ranked={
+            players.filter((p) => !p.isGuest).length > 4 &&
+            !players[turn % players.length].isGuest
+          }
           onClose={handleCloseGeneralaServidaDialog}
           onConfirm={onGeneralaServidaConfirm}
         />

@@ -9,8 +9,18 @@ import { Separator } from "@/components/ui/separator";
 export default async function GamesPage() {
   const games: Game[] = await getGames();
 
+  const definedCount = (game: Game) =>
+    game.players.filter((p) => !p.isGuest).length;
+
+  const isRanked = (game: Game) => {
+    if (definedCount(game) < 5) return false;
+    if (game.winnerId == null) return true;
+    const winner = game.players.find((p) => p.id === game.winnerId);
+    return !winner?.isGuest;
+  };
+
   const totalGames = games.length;
-  const rankedGames = games.filter((game) => game.players.length > 4).length;
+  const rankedGames = games.filter(isRanked).length;
 
   const formatDateTime = (date: Date) => {
     const day = date.getDate();
@@ -42,7 +52,7 @@ export default async function GamesPage() {
                 {formatDateTime(new Date(game.createdAt))}
               </h2>
               <div className="flex flex-wrap gap-2">
-                {game.players.length > 4 && (
+                {isRanked(game) ? (
                   <Badge
                     variant={"outline"}
                     className="text-sm font-mono text-green-500"
@@ -50,8 +60,7 @@ export default async function GamesPage() {
                     <BadgeCheck className="h-4 w-4" />
                     RANKED
                   </Badge>
-                )}
-                {game.players.length < 5 && (
+                ) : (
                   <Badge
                     variant={"outline"}
                     className="text-sm font-mono text-muted-foreground"
@@ -90,6 +99,11 @@ export default async function GamesPage() {
                       <Award className="h-4 w-4" />
                     )}
                     {player.name}
+                    {player.isGuest && (
+                      <span className="text-xs opacity-60 ml-1 italic">
+                        (inv.)
+                      </span>
+                    )}
                   </Badge>
                 ))}
               </div>

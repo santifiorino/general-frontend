@@ -27,7 +27,11 @@ export async function startGame(players: Player[]): Promise<{ id: string }> {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({
-      players: players.map(({ id, name }) => ({ id, name })),
+      players: players.map(({ id, name, isGuest }) => ({
+        id: isGuest ? null : id,
+        name,
+        isGuest: !!isGuest,
+      })),
     }),
   });
   if (!res.ok) {
